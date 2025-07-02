@@ -108,6 +108,51 @@ def registrar_venta():
     conn.close()
     return redirect("/ventas")
 
+@app.route("/historial")
+def historial():
+    producto = request.args.get("producto")
+
+    conn = conectar()
+    cursor = conn.cursor()
+
+    compras_q = """
+        SELECT c.fecha, p.nombre, c.proveedor, c.cantidad, c.costo_unitario
+        FROM compras c
+        JOIN productos p ON c.producto_id = p.id
+    """
+    ventas_q = """
+        SELECT v.fecha, p.nombre, v.cantidad, v.precio_unitario
+        FROM ventas v
+        JOIN productos p ON v.producto_id = p.id
+    """
+
+    params = ()
+    if producto:
+        compras_q += " WHERE p.nombre = ?"
+        ventas_q  += " WHERE p.nombre = ?"
+        params = (producto,)
+
+    compras_q += " ORDER BY c.fecha DESC"
+    ventas_q  += " ORDER BY v.fecha DESC"
+
+    cursor.execute(compras_q, params)
+    compras = cursor.fetchall()
+
+    cursor.execute(ventas_q, params)
+    ventas = cursor.fetchall()
+
+    # lista de productos para el selector
+    cursor.execute("SELECT DISTINCT nombre FROM productos")
+    lista_prod = [row[0] for row in cursor.fetchall()]
+
+    conn.close()
+    return render_template(
+        "historial.html",
+        compras=compras,
+        ventas=ventas,
+        lista_prod=lista_prod,
+        producto_sel=producto
+    )
 
 
 
