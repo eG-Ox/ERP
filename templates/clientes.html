@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Clientes{% endblock %}
+{% block contenido %}
+
+<h2>Clientes</h2>
+
+<form class="row g-2 mb-4" method="post" action="/agregar_cliente">
+  <div class="col-md-3"><input name="nombre"    class="form-control" placeholder="Nombre" required></div>
+  <div class="col-md-2"><input name="ruc"       class="form-control" placeholder="RUC"></div>
+  <div class="col-md-3"><input name="direccion" class="form-control" placeholder="Dirección"></div>
+  <div class="col-md-2"><input name="telefono"  class="form-control" placeholder="Teléfono"></div>
+  <div class="col-md-2"><input name="correo"    class="form-control" placeholder="Correo"></div>
+  <div class="col-12 text-end"><button class="btn btn-primary">Agregar</button></div>
+</form>
+
+<table class="table table-bordered table-sm">
+  <thead class="table-light">
+    <tr>
+      <th>Nombre</th><th>RUC</th><th>Dirección</th><th>Teléfono</th><th>Correo</th><th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in clientes %}
+      <tr>
+        <td>{{ c[1] }}</td>
+        <td>{{ c[2] }}</td>
+        <td>{{ c[3] }}</td>
+        <td>{{ c[4] }}</td>
+        <td>{{ c[5] }}</td>
+        <td>
+          <a href="/editar_cliente/{{ c[0] }}" class="btn btn-sm btn-warning">✏️</a>
+          <a href="/eliminar_cliente/{{ c[0] }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar cliente?')">🗑️</a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

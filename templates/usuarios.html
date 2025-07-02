@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block contenido %}
+<h2>Usuarios</h2>
+
+<!-- Formulario para crear -->
+<form class="row g-2 mb-4" method="post" action="/agregar_usuario">
+  <div class="col-md-3"><input name="usuario"  class="form-control" placeholder="Usuario" required></div>
+  <div class="col-md-3"><input type="password" name="clave" class="form-control" placeholder="Contraseña" required></div>
+  <div class="col-md-2">
+    <select name="rol" class="form-select">
+      <option value="vendedor">vendedor</option>
+      <option value="admin">admin</option>
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-primary w-100">Crear</button></div>
+</form>
+
+<table class="table table-bordered table-sm">
+  <thead class="table-light"><tr><th>ID</th><th>Usuario</th><th>Rol</th><th>Acciones</th></tr></thead>
+  <tbody>
+    {% for u in usuarios %}
+    <tr>
+      <td>{{ u[0] }}</td><td>{{ u[1] }}</td><td>{{ u[2] }}</td>
+      <td>
+        <a class="btn btn-sm btn-warning" href="/editar_usuario/{{ u[0] }}">✏️</a>
+        {% if u[0] != current_user.id %}
+          <a class="btn btn-sm btn-danger" href="/eliminar_usuario/{{ u[0] }}"
+             onclick="return confirm('¿Eliminar usuario?')">🗑️</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

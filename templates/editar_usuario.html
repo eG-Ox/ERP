@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Editar usuario{% endblock %}
+{% block contenido %}
+<h2>Editar usuario</h2>
+
+<form method="post">
+  <label>Usuario:</label>
+  <input name="usuario" value="{{ u[1] }}" required><br><br>
+
+  <label>Nuevo rol:</label>
+  <select name="rol">
+    <option value="vendedor" {{ 'selected' if u[2]=='vendedor' else '' }}>vendedor</option>
+    <option value="admin" {{ 'selected' if u[2]=='admin' else '' }}>admin</option>
+  </select><br><br>
+
+  <label>Nueva contraseña (opcional):</label>
+  <input type="password" name="clave" placeholder="Déjala vacía si no cambia"><br><br>
+
+  <button class="btn btn-primary">Guardar</button>
+  <a href="/usuarios" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

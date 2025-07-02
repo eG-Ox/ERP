@@ -28,14 +28,19 @@
     <input type="number" name="precio_unitario" class="form-control" step="0.01" required>
   </div>
 
-  <!-- 🚩 Campo Cliente (nuevo) -->
-  <div class="mb-3">
-    <label>Cliente (opcional):</label>
-    <input type="text" name="cliente" class="form-control">
-  </div>
+<!-- Cliente -->
+<div class="mb-3">
+  <label>Cliente:</label>
+  <select name="cliente_id" class="form-select">
+    <option value="">-- Sin registrar --</option>
+    {% for c in clientes %}
+      <option value="{{ c[0] }}">{{ c[1] }}</option>
+    {% endfor %}
+  </select>
+  <small class="form-text text-muted">O escribe un cliente rápido:</small>
+  <input type="text" name="cliente_txt" class="form-control" placeholder="Cliente libre">
+</div>
 
-  <button type="submit" class="btn btn-success">Guardar venta</button>
-</form>
 
 <a href="/productos">← Volver a productos</a>
 {% endblock %}

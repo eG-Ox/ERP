@@ -11,17 +11,26 @@
     <button type="submit">Agregar</button>
   </form>
 
-  <table border="1">
+  <table class="table table-bordered table-sm table-striped">
+  <thead class="table-light">
     <tr>
-      <th>ID</th><th>Nombre</th><th>Stock</th><th>Precio</th>
+      <th>Nombre</th><th>Stock</th><th>Precio</th><th>Acciones</th>
     </tr>
+  </thead>
+  <tbody>
     {% for p in productos %}
     <tr>
-      <td>{{ p[0] }}</td>
       <td>{{ p[1] }}</td>
       <td>{{ p[2] }}</td>
-      <td>S/. {{ p[3] }}</td>
+      <td>S/. {{ "%.2f"|format(p[3]) }}</td>
+      <td>
+        <a href="/editar_producto/{{ p[0] }}" class="btn btn-sm btn-primary">✏️</a>
+        <a href="/eliminar_producto/{{ p[0] }}" class="btn btn-sm btn-danger"
+           onclick="return confirm('¿Estás seguro de eliminar este producto?')">🗑️</a>
+      </td>
     </tr>
     {% endfor %}
-  </table>
+  </tbody>
+</table>
+
 {% endblock %}
