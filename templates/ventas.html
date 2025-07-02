@@ -4,21 +4,37 @@
 {% block contenido %}
 <h2>Registrar venta</h2>
 
-<form method="post" action="/registrar_venta">
-  <label>Producto:</label>
-  <select name="producto_id" required>
-    {% for p in productos %}
-    <option value="{{ p[0] }}">{{ p[1] }}</option>
-    {% endfor %}
-  </select><br><br>
+<form method="post" action="/registrar_venta" class="mb-4">
 
-  <label>Cantidad:</label>
-  <input type="number" name="cantidad" min="1" required><br><br>
+  <!-- Producto -->
+  <div class="mb-3">
+    <label>Producto:</label>
+    <select name="producto_id" class="form-select" required>
+      {% for p in productos %}
+        <option value="{{ p[0] }}">{{ p[1] }}</option>
+      {% endfor %}
+    </select>
+  </div>
 
-  <label>Precio unitario (S/.):</label>
-  <input type="number" name="precio_unitario" step="0.01" required><br><br>
+  <!-- Cantidad -->
+  <div class="mb-3">
+    <label>Cantidad:</label>
+    <input type="number" name="cantidad" class="form-control" min="1" required>
+  </div>
 
-  <button type="submit">Guardar venta</button>
+  <!-- Precio unitario -->
+  <div class="mb-3">
+    <label>Precio unitario (S/.):</label>
+    <input type="number" name="precio_unitario" class="form-control" step="0.01" required>
+  </div>
+
+  <!-- 🚩 Campo Cliente (nuevo) -->
+  <div class="mb-3">
+    <label>Cliente (opcional):</label>
+    <input type="text" name="cliente" class="form-control">
+  </div>
+
+  <button type="submit" class="btn btn-success">Guardar venta</button>
 </form>
 
 <a href="/productos">← Volver a productos</a>

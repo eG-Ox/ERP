@@ -83,11 +83,12 @@ def registrar_venta():
     producto_id = request.form["producto_id"]
     cantidad = int(request.form["cantidad"])
     precio_unitario = float(request.form["precio_unitario"])
+    cliente = request.form.get("cliente", "")  # Opcional
 
     conn = conectar()
     cursor = conn.cursor()
 
-    # Verificar stock actual
+    # Verificar stock
     cursor.execute("SELECT stock FROM productos WHERE id = ?", (producto_id,))
     stock_actual = cursor.fetchone()[0]
 
@@ -95,55 +96,94 @@ def registrar_venta():
         conn.close()
         return "Error: no hay suficiente stock para esta venta."
 
-    # Registrar la venta
+    # Registrar venta
     cursor.execute("""
-        INSERT INTO ventas (producto_id, cantidad, precio_unitario, fecha)
-        VALUES (?, ?, ?, CURRENT_DATE)
-    """, (producto_id, cantidad, precio_unitario))
+        INSERT INTO ventas (producto_id, cantidad, precio_unitario, fecha, cliente)
+        VALUES (?, ?, ?, CURRENT_DATE, ?)
+    """, (producto_id, cantidad, precio_unitario, cliente))
+
+    # Obtener ID de la venta recién insertada
+    venta_id = cursor.lastrowid
 
     # Actualizar stock
     cursor.execute("UPDATE productos SET stock = stock - ? WHERE id = ?", (cantidad, producto_id))
 
     conn.commit()
     conn.close()
-    return redirect("/ventas")
+    return redirect(f"/factura/{venta_id}")
+
 
 @app.route("/historial")
 def historial():
-    producto = request.args.get("producto")
+    # ⬇️ Parámetros opcionales llegados por ?producto=x&proveedor=y&desde=2025-07-01&hasta=2025-07-31
+    producto  = request.args.get("producto")
+    proveedor = request.args.get("proveedor")
+    desde     = request.args.get("desde")
+    hasta     = request.args.get("hasta")
 
-    conn = conectar()
+    conn   = conectar()
     cursor = conn.cursor()
 
+    # ---------- CONSULTA COMPRAS ----------
     compras_q = """
         SELECT c.fecha, p.nombre, c.proveedor, c.cantidad, c.costo_unitario
         FROM compras c
         JOIN productos p ON c.producto_id = p.id
+        WHERE 1=1
     """
+    params_c = []
+
+    if producto:
+        compras_q += " AND p.nombre = ?"
+        params_c.append(producto)
+
+    if proveedor:
+        compras_q += " AND c.proveedor = ?"
+        params_c.append(proveedor)
+
+    if desde:
+        compras_q += " AND date(c.fecha) >= date(?)"
+        params_c.append(desde)
+
+    if hasta:
+        compras_q += " AND date(c.fecha) <= date(?)"
+        params_c.append(hasta)
+
+    compras_q += " ORDER BY c.fecha DESC"
+    cursor.execute(compras_q, tuple(params_c))
+    compras = cursor.fetchall()
+
+    # ---------- CONSULTA VENTAS ----------
     ventas_q = """
         SELECT v.fecha, p.nombre, v.cantidad, v.precio_unitario
         FROM ventas v
         JOIN productos p ON v.producto_id = p.id
+        WHERE 1=1
     """
+    params_v = []
 
-    params = ()
     if producto:
-        compras_q += " WHERE p.nombre = ?"
-        ventas_q  += " WHERE p.nombre = ?"
-        params = (producto,)
+        ventas_q += " AND p.nombre = ?"
+        params_v.append(producto)
 
-    compras_q += " ORDER BY c.fecha DESC"
-    ventas_q  += " ORDER BY v.fecha DESC"
+    if desde:
+        ventas_q += " AND date(v.fecha) >= date(?)"
+        params_v.append(desde)
 
-    cursor.execute(compras_q, params)
-    compras = cursor.fetchall()
+    if hasta:
+        ventas_q += " AND date(v.fecha) <= date(?)"
+        params_v.append(hasta)
 
-    cursor.execute(ventas_q, params)
+    ventas_q += " ORDER BY v.fecha DESC"
+    cursor.execute(ventas_q, tuple(params_v))
     ventas = cursor.fetchall()
 
-    # lista de productos para el selector
+    # ---------- LISTAS PARA DESPLEGABLES ----------
     cursor.execute("SELECT DISTINCT nombre FROM productos")
     lista_prod = [row[0] for row in cursor.fetchall()]
+
+    cursor.execute("SELECT DISTINCT proveedor FROM compras WHERE proveedor IS NOT NULL AND proveedor != ''")
+    lista_prov = [row[0] for row in cursor.fetchall()]
 
     conn.close()
     return render_template(
@@ -151,8 +191,31 @@ def historial():
         compras=compras,
         ventas=ventas,
         lista_prod=lista_prod,
-        producto_sel=producto
+        lista_prov=lista_prov,
+        producto_sel=producto,
+        proveedor_sel=proveedor,
+        desde_sel=desde,
+        hasta_sel=hasta
     )
+
+@app.route("/factura/<int:venta_id>")
+def factura(venta_id):
+    conn = conectar()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT v.id, v.fecha, p.nombre, v.cantidad, v.precio_unitario, v.cliente
+        FROM ventas v
+        JOIN productos p ON v.producto_id = p.id
+        WHERE v.id = ?
+    """, (venta_id,))
+    venta = cursor.fetchone()
+    conn.close()
+
+    if not venta:
+        return "Factura no encontrada."
+
+    return render_template("factura.html", venta=venta)
 
 
 
