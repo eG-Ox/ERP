@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for
 import sqlite3
 from datetime import datetime
+from flask import make_response
+import csv
+import io
 
 
 app = Flask(__name__)
@@ -216,6 +219,54 @@ def factura(venta_id):
         return "Factura no encontrada."
 
     return render_template("factura.html", venta=venta)
+
+@app.route("/exportar_historial")
+def exportar_historial():
+    conn = conectar()
+    cursor = conn.cursor()
+
+    # Obtener compras
+    cursor.execute("""
+        SELECT c.fecha, p.nombre, c.proveedor, c.cantidad, c.costo_unitario
+        FROM compras c
+        JOIN productos p ON c.producto_id = p.id
+        ORDER BY c.fecha DESC
+    """)
+    compras = cursor.fetchall()
+
+    # Obtener ventas
+    cursor.execute("""
+        SELECT v.fecha, p.nombre, v.cantidad, v.precio_unitario, v.cliente
+        FROM ventas v
+        JOIN productos p ON v.producto_id = p.id
+        ORDER BY v.fecha DESC
+    """)
+    ventas = cursor.fetchall()
+
+    conn.close()
+
+    # Crear CSV en memoria
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Encabezado y datos de compras
+    writer.writerow(["===== HISTORIAL DE COMPRAS ====="])
+    writer.writerow(["Fecha", "Producto", "Proveedor", "Cantidad", "Costo Unitario"])
+    for c in compras:
+        writer.writerow(c)
+    writer.writerow([])
+
+    # Encabezado y datos de ventas
+    writer.writerow(["===== HISTORIAL DE VENTAS ====="])
+    writer.writerow(["Fecha", "Producto", "Cantidad", "Precio Unitario", "Cliente"])
+    for v in ventas:
+        writer.writerow(v)
+
+    # Preparar respuesta para descarga
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=historial.csv"
+    response.headers["Content-type"] = "text/csv"
+    return response
 
 
 
