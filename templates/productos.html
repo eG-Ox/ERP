@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Productos{% endblock %}
+
+{% block contenido %}
+  <h2>Lista de productos</h2>
+
+  <form method="post" action="/agregar_producto">
+    <input type="text" name="nombre" placeholder="Nombre" required>
+    <input type="number" name="stock" placeholder="Stock" required>
+    <input type="number" name="precio" placeholder="Precio" required>
+    <button type="submit">Agregar</button>
+  </form>
+
+  <table border="1">
+    <tr>
+      <th>ID</th><th>Nombre</th><th>Stock</th><th>Precio</th>
+    </tr>
+    {% for p in productos %}
+    <tr>
+      <td>{{ p[0] }}</td>
+      <td>{{ p[1] }}</td>
+      <td>{{ p[2] }}</td>
+      <td>S/. {{ p[3] }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
