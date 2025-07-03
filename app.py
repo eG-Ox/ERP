@@ -4,16 +4,20 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from dataclasses import dataclass
 from functools import wraps
 from datetime import datetime
+import os
 import sqlite3
 import csv
 import io
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "erp-seguro"
 
 # ------------------ Conexion ------------------
+
 def conectar():
-    return sqlite3.connect("data/db.sqlite3")
+    db_path = os.getenv("DB_PATH", "data/db.sqlite3")  # <= lee DB_PATH o usa local
+    return sqlite3.connect(db_path)
 
 # ------------------ Login y Roles ------------------
 login_manager = LoginManager(app)

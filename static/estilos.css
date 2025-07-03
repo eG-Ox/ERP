@@ -1,0 +1,103 @@
+/* ────────────────────────────────────────────
+   Paleta y variables (fácil de cambiar)
+──────────────────────────────────────────────*/
+:root {
+  --bs-primary:     rgba(0.0.0.10);   /* azul corporativo */
+  --bs-secondary:   #6c757d;
+  --bs-success:     #198754;
+  --bs-warning:     #f59e0b;
+  --bs-danger:      #dc3545;
+  --bs-info:        #0dcaf0;
+  --bs-light:       #f8f9fa;
+  --bs-dark:        #212529;
+
+  --bg-body:        #f5f6f8;
+  --font-main:      "Segoe UI", Roboto, sans-serif;
+}
+
+/* ────────────────────────────────────────────
+   Ajustes globales
+──────────────────────────────────────────────*/
+html, body {
+  height: 100%;
+  background-color: var(--bg-body);
+  font-family: var(--font-main);
+  font-size: 15px;
+}
+
+h1, h2, h3 {
+  color: var(--bs-primary);
+  font-weight: 600;
+}
+
+a { text-decoration: none; }
+
+/* ────────────────────────────────────────────
+   Navbar
+──────────────────────────────────────────────*/
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: .5px;
+}
+.nav-link.active, .nav-link:hover {
+  color: var(--bs-warning) !important;
+}
+.navbar {
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+
+/* ────────────────────────────────────────────
+   Botones
+──────────────────────────────────────────────*/
+.btn {
+  font-size: .85rem;
+  border-radius: .4rem;
+  transition: all .15s;
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* ────────────────────────────────────────────
+   Tablas
+──────────────────────────────────────────────*/
+.table thead th {
+  background-color: var(--bs-primary);
+  color: #fff;
+}
+.table-striped>tbody>tr:nth-of-type(odd)>* {
+  background-color: rgba(0,0,0,.03);
+}
+.table-hover tbody tr:hover>* {
+  background-color: rgba(0,110,224,.07);
+}
+
+/* ────────────────────────────────────────────
+   Formularios
+──────────────────────────────────────────────*/
+.form-control, .form-select {
+  font-size: .85rem;
+  border-radius: .3rem;
+}
+input:focus, select:focus, textarea:focus {
+  box-shadow: 0 0 0 .15rem rgba(0,110,224,.25);
+}
+
+/* ────────────────────────────────────────────
+   Tarjetas / contenedores
+──────────────────────────────────────────────*/
+.card,
+.table {
+  border-radius: .5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,.05);
+}
+
+/* ────────────────────────────────────────────
+   Footer
+──────────────────────────────────────────────*/
+footer {
+  margin-top: 3rem;
+  padding: .7rem 0;
+  font-size: .8rem;
+  color: var(--bs-secondary);
+}

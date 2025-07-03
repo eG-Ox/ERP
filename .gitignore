@@ -1,5 +1,21 @@
+# Entorno virtual
+venv/
+.env
+
+# Archivos del sistema
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+
+# SQLite
+*.sqlite3
 *.db
-data/db.sqlite3
-.env
+*.db-journal
+
+# Archivos de VS Code o editores
+.vscode/
+*.code-workspace
+
+# Archivos de logs
+*.log
